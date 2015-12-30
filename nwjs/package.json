@@ -1,0 +1,9 @@
+{
+	"name": "nw-demo",
+	"title": "nw-demo",
+	"main": "./app/index.html",
+	"window": {
+		"frame": true,
+		"toolbar": true
+	}
+}
