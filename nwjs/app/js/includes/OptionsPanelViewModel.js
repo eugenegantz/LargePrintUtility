@@ -66,6 +66,18 @@ define(
 			},
 
 
+			"getSidesNumber": function(){
+				var value = $('[name="eyelets_placement_format"]:checked',this.el).val();
+				if (  value == "corners" || value == "perimeter"  ) {
+					return 4;
+
+				} else if (  value == "short" || value == "long"  ) {
+					return 2;
+
+				}
+			},
+
+
 			"_interfaceGetEyelets": function(){
 				var eyelets = {};
 				var tmp, c;
@@ -190,6 +202,7 @@ define(
 			"_autoEyelets": function(){
 				var image = this._operImageContainer.image;
 				var rect = image.getRect({"units":"cm","round":4});
+				var tmp;
 
 				var margin = $("[name='margin']",this.el).val();
 
@@ -198,6 +211,12 @@ define(
 				var amount = parseInt($("[name='eyelets_amount']",this.el).val());
 
 				if (  isNaN(amount) || amount < 4  ) amount = 4;
+
+				/*
+				if (  tmp = amount % this.getSidesNumber()  ){
+					amount -= tmp;
+				}
+				*/
 
 				// if (  amount % 4 > 0  ) amount += amount % 4;
 
@@ -421,12 +440,11 @@ define(
 				var tmp = ["left", "right", "top", "bottom"];
 
 				for(var c=0; c<tmp.length; c++){
-					this.filters.eyelets.set("stepLength" + tmp[c], null);
+					this.filters.eyelets.set("stepLength" + _utils.stringCapFirst(tmp[c]), null);
 				}
 
 				this._autoEyelets();
 
-				this.render();
 			},
 
 
