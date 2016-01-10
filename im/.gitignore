@@ -3,3 +3,7 @@
 *.rdf
 *.icc
 *.dat
+*.txt
+*.html
+*.log
+ChangeLog

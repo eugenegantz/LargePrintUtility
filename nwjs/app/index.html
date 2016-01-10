@@ -21,40 +21,109 @@
 		</div>
 		<div class="panel-body">
 			<div class="form-group">
+
 				<ul style="width:100%;" class="options-table">
 
-					<li class="options-table__row">
-						<label class="options-table__label">
-							<span class="options-table__col options-table__col_label">Пустой пункт</span>
-							<span class="options-table__col">
-								<div class="input-checkbox">
-									<input type="checkbox">
-									<div class="input-checkbox__decorator"></div>
-								</div>
-							</span>
-						</label>
-					</li>
+					<li class="options-table__row" style="position:relative;">
 
-					<li class="options-table__row">
 						<label class="options-table__label">
-							<span class="options-table__col options-table__col_label">
-								<span>Шаг люверсов (см)</span>
+							<span class="options-table__col options-table__col_label" style="flex:1">
+								<span>Количество и шаг люверсов<br />(см)</span>
 							</span>
-							<span class="options-table__col">
-								<input type="number" name="eyelets_step" class="form-control" value="25">
-							</span>
-						</label>
-					</li>
-
-					<li class="options-table__row">
-						<label class="options-table__label">
-							<span class="options-table__col options-table__col_label">
-								<span>Количество люверсов</span>
-							</span>
-							<span class="options-table__col">
+							<span class="options-table__col" style="flex:1">
 								<input type="number" name="eyelets_amount" min="4" step="1" class="form-control" value="16">
 							</span>
+							<span style="flex:1">
+								<input type="number" name="eyelets_step" class="form-control" disabled value="25">
+							</span>
 						</label>
+
+						<ul class="options-table options-table_dropdown" style="width:340px;">
+							<li class="options-table__row">
+								<label class="options-table__label">
+									<span class="options-table__col options-table__col_label" style="flex:1;">
+										<span>Сверху</span>
+									</span>
+									<span class="options-table__col" style="flex:1;">
+										<input type="number" name="eyelets_amount_top" min="0" step="1" class="form-control" value="16">
+									</span>
+									<span style="flex:1;">
+										<input type="number" name="eyelets_step_length_top" class="form-control">
+									</span>
+									<span style="flex:1">
+										<div class="input-checkbox" style="margin-left:12px;">
+											<input type="checkbox" name="eyelets_step_auto_length_top">
+											<div class="input-checkbox__decorator"></div>
+										</div>
+										Авто
+									</span>
+								</label>
+							</li>
+
+							<li class="options-table__row">
+								<label class="options-table__label">
+									<span class="options-table__col options-table__col_label" style="flex:1;">
+										<span>Слева</span>
+									</span>
+									<span class="options-table__col" style="flex:1;">
+										<input type="number" name="eyelets_amount_left" min="0" step="1" class="form-control" value="16">
+									</span>
+									<span style="flex:1;">
+										<input type="number" name="eyelets_step_length_left" class="form-control">
+									</span>
+									<span style="flex:1">
+										<div class="input-checkbox" style="margin-left:12px;">
+											<input type="checkbox" name="eyelets_step_auto_length_left">
+											<div class="input-checkbox__decorator"></div>
+										</div>
+										Авто
+									</span>
+								</label>
+							</li>
+
+							<li class="options-table__row">
+								<label class="options-table__label">
+									<span class="options-table__col options-table__col_label" style="flex:1;">
+										<span>Справа</span>
+									</span>
+									<span class="options-table__col" style="flex:1;">
+										<input type="number" name="eyelets_amount_right" min="0" step="1" class="form-control" value="16">
+									</span>
+									<span style="flex:1;">
+										<input type="number" name="eyelets_step_length_right" class="form-control">
+									</span>
+									<span style="flex:1">
+										<div class="input-checkbox" style="margin-left:12px;">
+											<input type="checkbox" name="eyelets_step_auto_length_right">
+											<div class="input-checkbox__decorator"></div>
+										</div>
+										Авто
+									</span>
+								</label>
+							</li>
+
+							<li class="options-table__row">
+								<label class="options-table__label">
+									<span class="options-table__col options-table__col_label" style="flex:1;">
+										<span>Снизу</span>
+									</span>
+									<span class="options-table__col" style="flex:1;">
+										<input type="number" name="eyelets_amount_bottom" min="0" class="form-control" value="16">
+									</span>
+									<span style="flex:1;">
+										<input type="number" name="eyelets_step_length_bottom" class="form-control">
+									</span>
+									<span style="flex:1">
+										<div class="input-checkbox" style="margin-left:12px;">
+											<input type="checkbox" name="eyelets_step_auto_length_bottom">
+											<div class="input-checkbox__decorator"></div>
+										</div>
+										Авто
+									</span>
+								</label>
+							</li>
+						</ul>
+
 					</li>
 
 					<li class="options-table__row">
@@ -85,7 +154,7 @@
 						<div class="text-center"><label>Расположение</label></div>
 						<div class="radio">
 							<label>
-								<input type="radio" name="eyelets_placement_format" value="perimeter">
+								<input type="radio" name="eyelets_placement_format" value="perimeter" checked>
 								По периметру
 							</label>
 						</div>
@@ -123,11 +192,18 @@
 					<li class="options-table__row" style="text-align:center;">
 						<label>
 							<span>Путь к конечному файлу</span>
-							<input type="file" name="destination_file" nwsaveas  accept=".jpeg,.jpg,.tif,.tiff,.psd,.pdf">
+							<input type="file" name="destination_file" nwsaveas  accept=".jpeg,.jpg,.tif,.tiff">
 						</label>
 					</li>
 
+					<li class="options-table__row options-table__row_devider"></li>
+
+					<li>
+						<button class="btn btn-primary" name="save_button" style="width:100%;">Сохранить</button>
+					</li>
+
 				</ul>
+
 			</div>
 		</div>
 	</div>

@@ -18,6 +18,29 @@ _utils = {
 		var regexp = new RegExp("[" + d.join("") + "]", "g");
 		s = s.replace(regexp, d[0]);
 		return s.split(d[0]);
+	},
+
+	"stringCapFirst": function(str){
+		if (typeof str != "string") return "";
+		if (!str.length) return "";
+		return str[0].toUpperCase() + str.slice(1,str.length);
+	},
+
+	"arrayIntersect": function(){
+		var merged = [];
+		for(var c=0; c<arguments.length; c++){
+			merged = merged.concat(arguments[c]);
+		}
+		var tmp = {};
+		var res = [];
+		for(c=0; c<merged.length; c++){
+			if (  tmp.hasOwnProperty(merged[c])  ){
+				res.push(merged[c]);
+				continue;
+			}
+			tmp[merged[c]] = 1;
+		}
+		return res;
 	}
 };
 
@@ -47,7 +70,7 @@ $(document).ready(function(){
 			win.height = 768;
 			win.width = 1024;
 
-			win.title = "Приложение для рассчета установки люверсов";
+			win.title = "Утилита для широкоформатной печати";
 
 			// ----------------------------------------------------------------------------------------
 
