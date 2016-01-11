@@ -54,19 +54,19 @@ define(
 				// --------------------------------------------------------------------------------
 
 				var self					= this;
-				var amount			= this.get("amount");
+				var amount				= parseInt(this.get("amount"));
 				var plc					= this.get("placementFormat");
 				var container			= this.get("container");
 				var imageInstance	= container.image;
 				var rect					= imageInstance.getRect({"units": "cm", "round": 4});
-				var margin				= this.get("pageMargin");
-				var diam				= this.get("diameter");
+				var margin				= parseFloat(this.get("pageMargin"));
+				var diam					= parseFloat(this.get("diameter"));
 
 				var long				= rect.w > rect.h ? rect.w : rect.h;
 				var short			= rect.w < rect.h ? rect.w : rect.h;
 				var width			= rect.w;
 				var height			= rect.h;
-				var mWidth		= width - (margin * 2);
+				var mWidth			= width - (margin * 2);
 				var mHeight		= height - (margin * 2);
 				var P					= (width + height) * 2;
 				var ratio				= width / height;
@@ -118,6 +118,18 @@ define(
 
 				// --------------------------------------------------------------------------------
 
+				var isStepAutoLengthEnabled = function(){
+					var tmp = ["left","right","top","bottom"];
+					for(var c=0; c<tmp.length; c++){
+						if (  self.get("stepLength" + _utils.stringCapFirst(tmp[c])) === null  ){
+							return false;
+						}
+					}
+					return true;
+				};
+
+				// --------------------------------------------------------------------------------
+
 				var calcSideAmount = function(side){
 					var sidesCount = 0;
 					var tmp;
@@ -125,7 +137,7 @@ define(
 					var merged = sides.top.concat(sides.left, sides.bottom, sides.right);
 
 					if (  self.get("amount_"+side) !== null  ){
-						return self.get("amount_"+side);
+						return parseInt(self.get("amount_"+side));
 					}
 
 					var isShortSide;
@@ -139,7 +151,7 @@ define(
 					if (  !merged.length  ){
 						tmp = Math.round((["top","bottom"].indexOf(side) > -1 ? mWidth : mHeight) / stepLength);
 						if (!isShortSide){
-							//tmp = Math.ceil(tmp * ratio2);
+							//tmp = Math.floor(tmp * ratio2);
 						}
 						return tmp;
 					}
@@ -173,6 +185,7 @@ define(
 
 				var calcSideStepLength = function(side, amount){
 					var tmp = self.get("stepLength" + _utils.stringCapFirst(side));
+
 					if (  tmp !== null  ){
 						return tmp;
 					}
@@ -182,8 +195,8 @@ define(
 
 					} else if (  side == "left" || side == "right"  ){
 						tmp = sides.top.concat(sides.bottom);
-						return Math.round(((mHeight - (!tmp.length ? diam : 0)) / (amount + (!tmp.length ? -1 : 0))) * 1000) / 1000;
-
+						tmp = Math.round(((mHeight - (!tmp.length ? diam : 0)) / (amount + (!tmp.length ? -1 : 0))) * 1000) / 1000;
+						return tmp == Infinity ? 0 : tmp;
 					}
 				};
 
@@ -247,11 +260,11 @@ define(
 
 						for(c=0; c<sideAmount; c++){
 
-							if (c == 0){
-
-							} else if (c == sideAmount - 1){
-								pos.y += sideStepLength_;
+							if (c == sideAmount - 1){
+								pos.y += !c ? 0 : sideStepLength_;
 								bottom = pos.y + diam;
+
+							} else if (c ==0) {
 
 							} else {
 								pos.y += sideStepLength_;
@@ -312,11 +325,11 @@ define(
 						bottom = pos.y;
 
 						for(c=0; c<sideAmount; c++){
-							if (c == 0){
-
-							} else if (c == sideAmount - 1){
-								pos.y += sideStepLength_;
+							if (c == sideAmount - 1){
+								pos.y += !c ? 0 : sideStepLength_;
 								bottom = pos.y + diam;
+
+							} else if (c == 0){
 
 							} else {
 								pos.y += sideStepLength_;

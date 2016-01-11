@@ -45,6 +45,9 @@ define(
 				clearTimeout(this.timers.applyLayers);
 				this.timers.applyLayers = setTimeout(
 					function(){
+
+						if (  !self._operImageContainer  ) return;
+
 						self._operImageContainer.applyLayers();
 						var b64img = self._operImageContainer.toDataURL({"width":480});
 						var image = new Image();
@@ -75,6 +78,26 @@ define(
 					return 2;
 
 				}
+			},
+
+
+			"_interfaceSetDefault": function(){
+
+				/*
+				this._interfaceSetEyelets({
+					"left": {"amount": 4, "stepAutoLength": true},
+					"right": {"amount": 4, "stepAutoLength": true},
+					"top": {"amount": 4, "stepAutoLength": true},
+					"bottom": {"amount": 4, "stepAutoLength": true}
+				});
+				*/
+
+				$('[name="eyelets_amount"]',this.el).val("16");
+
+				this._autoEyelets();
+
+				this._refreshEyelets();
+
 			},
 
 
@@ -136,7 +159,7 @@ define(
 					amount = 4,
 					amountSum = 0,
 					stepLength = null,
-					stepLength_ = null;
+					stepLength_ = null,
 					isStepAutoLength = true;
 
 				var filterArg = {};
@@ -190,16 +213,51 @@ define(
 
 				$('[name="eyelets_amount"]', this.el).val(amountSum);
 
-				this.filters.eyelets.set(filterArg);
+				// this.filters.eyelets.set(filterArg);
 
 				if (  $('[name="source_file"]', this.el).val()  ){
-					this.render();
+					// this.render();
+					this._refreshEyelets();
 				}
 
 			},
 
 
+			"_refreshEyelets": function(){
+
+				var margin = parseFloat($("[name='margin']",this.el).val());
+				var diam = parseFloat($("[name='eyelets_diameter']",this.el).val());
+				var plc = $('[name="eyelets_placement_format"]:checked').val();
+				var eyelets = this._interfaceGetEyelets();
+
+				for(var side in eyelets){
+					if (  !eyelets.hasOwnProperty(side)  ) continue;
+					this.filters.eyelets.set(
+						"stepLength"+_utils.stringCapFirst(side),
+						(
+							eyelets[side].isStepAutoLength
+								? null
+								: parseFloat(eyelets[side].stepLength)
+						)
+					);
+					this.filters.eyelets.set("amount_"+side, eyelets[side].amount);
+				}
+
+				this.filters.eyelets.set("placementFormat", plc);
+
+				this.filters.eyelets.set("pageMargin", margin);
+
+				this.filters.eyelets.set("diameter", diam);
+
+				this.render();
+
+			},
+
+
 			"_autoEyelets": function(){
+
+				if (  !this._operImageContainer  ) return;
+
 				var image = this._operImageContainer.image;
 				var rect = image.getRect({"units":"cm","round":4});
 				var tmp;
@@ -241,7 +299,7 @@ define(
 
 				var eyeletsData = this.filters.eyelets.getEyelets();
 
-				var tmp = {"left":{},"right":{},"top":{},"bottom":{}};
+				tmp = {"left":{},"right":{},"top":{},"bottom":{}};
 
 				for(var prop in tmp){
 					if (!tmp.hasOwnProperty(prop)) continue;
@@ -258,106 +316,39 @@ define(
 
 			"_eventChangeEyeletsParam": function(){
 				this._interfaceSetEyelets(this._interfaceGetEyelets());
+				this._refreshEyelets();
 			},
 
 
 			"_eventChangePageMargin": function(){
 
-				// this._eventChangeEyeletsAmount();
-				// this._eventChangeEyeletsStep();
+				this._refreshEyelets();
 
-				var tmp = this._interfaceGetEyelets();
+			},
 
-				var isStepAutoLength = true;
 
-				for(var prop in tmp){
-					if (  !tmp.hasOwnProperty(prop)  ) continue;
-					if (  !tmp[prop].isStepAutoLength  ){
-						isStepAutoLength = false;
-						break;
-					}
-				}
+			"_eventChangeEyeletsDiam": function(){
 
-				this.filters.eyelets.set("pageMargin", parseFloat($("[name='margin']",this.el).val()));
-
-				if (  isStepAutoLength  ){
-					this._autoEyelets();
-				} else {
-					this.render();
-				}
+				this._refreshEyelets();
 
 			},
 
 
 			"_eventChangeStepLength2": function(){
 
-				var filtersProps = {};
-				var value, tmp, side;
-
-				var inputs = $('[name*="eyelets_step_length_"]',this.el);
-
-				var regExp = new RegExp(["_left", "_right", "_top", "_bottom"].join("|"),"g");
-
-				for(var c=0; c<inputs.length; c++){
-					if (  tmp = inputs[c].name.match(regExp)  ){
-						side = tmp[0].replace("_","");
-					} else {
-						continue;
-					}
-
-					value = parseFloat(inputs[c].value);
-					if (isNaN(value)) value = 1;
-					if (!value) value = 1;
-
-					filtersProps["stepLength" + _utils.stringCapFirst(side)] = value;
-				}
-
-				this.filters.eyelets.set(filtersProps);
-
-				this.render();
+				this._refreshEyelets();
 
 			},
 
 
-			"_eventChangeEyeletsStep": function(){
-
-				var image = this._operImageContainer.image;
-				var rect = image.getRect({"units":"cm","round":4});
-
-				var margin = $("[name='margin']",this.el).val();
-
-				var stepLen = $("[name='eyelets_step']",this.el).val();
-
-				var perimeter = (rect.w + rect.h - (margin * 2)) * 2;
-
-				var amount = Math.round(perimeter / stepLen);
-
-				if (  amount < 4  ){
-					this._eventChangeEyeletsAmount();
-					return;
-				}
-
-
-				this.filters.eyelets.set("stepLength", stepLen);
-
-				this.filters.eyelets.set({
-					"amount": amount,
-					"amount_left": amount,
-					"amount_right": amount,
-					"amount_top": amount,
-					"amount_bottom": amount
-				});
-
-				this.interfaceSetEyeletsAmount(amount);
-
-				this.render();
-
-			},
+			"_eventChangeEyeletsStep": function(){},
 
 
 			"_eventChangeEyeletsAmount": function(){
 
 				this._autoEyelets();
+
+				this._refreshEyelets();
 
 			},
 
@@ -394,62 +385,38 @@ define(
 							break;
 					}
 
-					this.filters.eyelets.set(key,value);
+					// this.filters.eyelets.set(key,value);
 
-					this.render();
+					// this.render();
 				}
 
 				$('[name="eyelets_amount"]').val(amountSum);
+
+				this._refreshEyelets();
 			},
 
 
-			"_eventChangeEyeletsDiam": function(){
+			"_eventChangedPlacementFormat": function(e){
 
-				var diam = $('[name="eyelets_diameter"]', this.el).val();
+				var plc = e.currentTarget.value;
 
-				diam = parseFloat(diam);
+				var amount = parseInt($('[name="eyelets_amount"]',this.el).val());
 
-				this.filters.eyelets.set("diameter", diam);
+				this.filters.eyelets.set("placementFormat", plc);
 
-				var tmp = this._interfaceGetEyelets();
-
-				var isStepAutoLength = true;
-
-				for(var prop in tmp){
-					if (  !tmp.hasOwnProperty(prop)  ) continue;
-					if (  !tmp[prop].isStepAutoLength  ){
-						isStepAutoLength = false;
-						break;
-					}
-				}
-
-				if (  isStepAutoLength  ){
-					this._autoEyelets();
-				} else {
-					this.render();
-				}
-
-			},
-
-
-			"_eventChangedPlacementFormat": function(){
-				var value = $('[name="eyelets_placement_format"]:checked',this.el).val();
-
-				this.filters.eyelets.set("placementFormat", value);
-
-				var tmp = ["left", "right", "top", "bottom"];
-
-				for(var c=0; c<tmp.length; c++){
-					this.filters.eyelets.set("stepLength" + _utils.stringCapFirst(tmp[c]), null);
+				if (plc == "perimeter" && amount < 6){
+					$('[name="eyelets_amount"]',this.el).val(6);
 				}
 
 				this._autoEyelets();
+
+				this._refreshEyelets();
 
 			},
 
 
 			"_eventChangedDestFile": function(){
-				// alert();
+				// void 0;
 			},
 
 
@@ -501,9 +468,7 @@ define(
 								var image = new Image();
 								image.src = self._operImageContainer.getDataURL({"width":480});
 								viewportInstance.setImage(image);
-								self._eventChangePageMargin();
-								self._eventChangeEyeletsDiam();
-								self._eventChangeEyeletsAmount();
+								self._interfaceSetDefault();
 							}
 						});
 
@@ -599,12 +564,7 @@ define(
 
 				this.filters.eyelets = new EyeletsImageLayer();
 
-				this._interfaceSetEyelets({
-					"left": {"amount": 4, "stepAutoLength": true},
-					"right": {"amount": 4, "stepAutoLength": true},
-					"top": {"amount": 4, "stepAutoLength": true},
-					"bottom": {"amount": 4, "stepAutoLength": true}
-				});
+				this._interfaceSetDefault();
 
 			}
 

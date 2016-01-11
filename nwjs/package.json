@@ -2,6 +2,7 @@
 	"name": "nw-demo",
 	"title": "nw-demo",
 	"main": "./app/index.html",
+	"icon": "./app/img/favicon.png",
 	"window": {
 		"frame": true,
 		"toolbar": true
