@@ -8,6 +8,8 @@ global.__dirname = modProcess.cwd();
 
 _test = Object.create(null);
 
+_test.App = require("nw.gui");
+
 _utils = {
 	"split": function(d,s){
 		if (arguments.length < 2) return;

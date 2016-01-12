@@ -118,10 +118,85 @@ define(
 
 				// --------------------------------------------------------------------------------
 
+				var isEvenly = function(arg){
+					var stLen, stLenBT, stLen1, clearence = 5;
+
+					// var merged = arg.top.concat(arg.bottom, arg.left, arg.right);
+					/*
+					if (
+						!arg["left"].length
+						&& useSides.indexOf("left") > -1
+					){
+						stLen = mHeight;
+
+					} else if (  arg["left"].length == 1  ) {
+						stLen = (height - margin) - arg["left"][0].y
+
+					}
+					*/
+
+					if (  !arg.left.length  ){
+						stLenBT = mHeight;
+
+					} else {
+						stLenBT = arg.left[0].y - margin;
+
+					}
+
+					for(var side in arg){
+
+						if (  !arg.hasOwnProperty(side)  ) continue;
+
+						var side_ = arg[side];
+
+						for(var c=0; c<side_.length; c++){
+
+							stLen1 = side_[c].stepLength;
+
+							if (  ["left","right"].indexOf(side) > -1  ){
+								if (  side_.length < 2  ) {
+									stLen1 = Math.abs((height - margin) - side_[c].y);
+
+								}
+							}
+
+							if (!stLen) stLen = stLen1;
+
+							if (
+								Math.abs(stLen - stLen1) > clearence
+								|| (
+									stLenBT
+									&& Math.abs(stLenBT - stLen1) > clearence
+								)
+							){
+								return false;
+							}
+
+						}
+
+					}
+
+					return true;
+				};
+
+				// --------------------------------------------------------------------------------
+
 				var isStepAutoLengthEnabled = function(){
 					var tmp = ["left","right","top","bottom"];
 					for(var c=0; c<tmp.length; c++){
-						if (  self.get("stepLength" + _utils.stringCapFirst(tmp[c])) === null  ){
+						if (  self.get("stepLength" + _utils.stringCapFirst(tmp[c])) !== null  ){
+							return false;
+						}
+					}
+					return true;
+				};
+
+				// --------------------------------------------------------------------------------
+
+				var isAutoAmountEnabled = function(){
+					var tmp = ["left","right","top","bottom"];
+					for(var c=0; c<tmp.length; c++){
+						if (  self.get("amount_" + tmp[c]) !== null  ){
 							return false;
 						}
 					}
@@ -349,6 +424,69 @@ define(
 
 					}
 
+				}
+
+				// ------------------------------------------------------------------------------------------
+
+				if (
+					_utils.arrayIntersect(useSides,["top","bottom", "left", "right"]).length
+					&& isStepAutoLengthEnabled()
+					&& isAutoAmountEnabled()
+				){
+					if (  !isEvenly(sides)  ){
+
+						var merged = sides.top.concat(sides.bottom, sides.left, sides.right);
+
+						var clone = this.clone();
+						clone.set("container", this.get("container"));
+						clone.set("pageMargin", self.get("pageMargin"));
+						clone.set("diameter", self.get("diameter"));
+
+						clone.set({
+							"amount_left": 0,
+							"amount_right": 0,
+							"amount_bottom": merged.length / 2,
+							"amount_top": merged.length / 2
+						});
+
+						var v, tmp;
+
+						for(c=0, v = merged.length / 2;  c<v; c++){
+							tmp = clone.getEyelets();
+							if (  !isEvenly(tmp)  ){
+
+								clone.set({
+									"amount_left":		clone.get("amount_left") + 1,
+									"amount_right":		clone.get("amount_right") + 1,
+									"amount_bottom":	clone.get("amount_bottom") - 1,
+									"amount_top":		clone.get("amount_top") - 1
+								});
+
+								/*
+								clone.set({
+									"stepLengthLeft": clone.get("stepLengthTop"),
+									"stepLengthRight": clone.get("stepLengthTop")
+								});
+
+								tmp = clone.getEyelets();
+
+								if (  isEvenly(tmp)  ){
+									return tmp;
+
+								} else {
+									clone.set({
+										"stepLengthLeft": null,
+										"stepLengthRight": null
+									});
+								}
+								*/
+
+							} else {
+								return tmp;
+							}
+						}
+
+					}
 				}
 
 				return sides;
